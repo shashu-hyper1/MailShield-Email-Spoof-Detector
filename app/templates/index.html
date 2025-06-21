@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>MailShield 🛡️ - Email Spoof Detection</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Bootstrap CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Fira Code', monospace;
+      background: linear-gradient(to bottom right, #0f2027, #203a43, #2c5364);
+      color: white;
+      min-height: 100vh;
+    }
+
+    .card {
+      border-radius: 16px;
+      background-color: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(8px);
+      box-shadow: 0 8px 16px rgba(0,0,0,0.4);
+    }
+
+    .spoof-badge {
+      font-size: 1rem;
+      padding: 0.5rem;
+      border-radius: 8px;
+    }
+
+    .high-risk {
+      background-color: #dc3545;
+      color: white;
+    }
+
+    .medium-risk {
+      background-color: #ffc107;
+      color: black;
+    }
+
+    .low-risk {
+      background-color: #28a745;
+      color: white;
+    }
+
+    footer {
+      margin-top: 40px;
+      text-align: center;
+      font-size: 0.8rem;
+      opacity: 0.7;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container py-5">
+    <h1 class="text-center mb-4">MailShield 🛡️</h1>
+    <p class="text-center mb-5">AI-Powered Email Spoof Detection System</p>
+
+    <form method="POST" enctype="multipart/form-data" class="mb-4">
+      <div class="input-group mb-3">
+        <input type="file" name="email_file" class="form-control" required>
+        <button class="btn btn-primary" type="submit">Analyze Email</button>
+      </div>
+    </form>
+
+    {% if report %}
+    <div class="card p-4">
+      <h4 class="mb-3">Analysis Report</h4>
+
+      <p><strong>From:</strong> {{ report.headers["From"] }}</p>
+      <p><strong>Return-Path:</strong> {{ report.headers["Return-Path"] }}</p>
+      <p><strong>Subject:</strong> {{ report.headers["Subject"] }}</p>
+      <p><strong>Domain Age:</strong> {{ report.domain_age }} days</p>
+      <a href="/download-pdf" class="btn btn-danger mt-3">📥 Download PDF Report</a>
+
+
+      <p>
+        <strong>Spoof Score:</strong> 
+        <span class="spoof-badge 
+          {% if report.spoof_score > 70 %}high-risk
+          {% elif report.spoof_score > 40 %}medium-risk
+          {% else %}low-risk
+          {% endif %}
+        ">
+          {{ report.spoof_score }}%
+        </span>
+      </p>
+
+      <p><strong>Detected Flags:</strong></p>
+      <ul>
+        {% for flag in report.flags %}
+          <li>{{ flag }}</li>
+        {% endfor %}
+      </ul>
+
+      <p><strong>Phishing Keywords Detected:</strong></p>
+      <ul>
+        {% for word in report.phishing_keywords %}
+          <li>{{ word }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+  </div>
+
+  <footer>
+    Made with ☕ by Team XALTRIXS | CyberHackathon 2025
+  </footer>
+
+</body>
+</html>
